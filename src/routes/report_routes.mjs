@@ -6,7 +6,7 @@ const ReportRoutes = Router()
 // * Notification Routes
 ReportRoutes.post('/new', reportController.new)
 ReportRoutes.put('/edit/:id', reportController.edit)
-ReportRoutes.delete('/delete/:id', reportController.delete)
+ReportRoutes.delete('/delete', reportController.delete)
 ReportRoutes.get('/get/:id', reportController.get)
 ReportRoutes.get('/getAll', reportController.getAll)
 ReportRoutes.get('/ultimosCreados', reportController.ultimosCreados)

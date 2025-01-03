@@ -1,13 +1,23 @@
-import { Certificates } from "../database/certificate.mjs"
+import { Certificates } from '../database/certificate.mjs'
 
 /* eslint-disable camelcase */
 export class certificatesController {
   static async new (req, res) {
     try {
-      //
+      const { name } = req.body
+
+      // Verificar si el nombre ya existe
+      const existCertificate = await Certificates.findOne({ where: { name } })
+      if (existCertificate) {
+        return res.status(400).send({ message: 'Ya existe un certificado con este nombre' })
+      }
+
+      // Crear el nuevo certificado
+      const certificate = await Certificates.create({ name })
+      return res.status(201).send({ message: 'Certificado creado con éxito', certificate })
     } catch (error) {
       console.error(error)
-      return res.status(500).send({ message: `${error.message}` })
+      return res.status(500).send({ message: `Error del servidor: ${error.message}` })
     }
   }
 

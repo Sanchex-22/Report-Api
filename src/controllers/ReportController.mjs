@@ -1,4 +1,4 @@
-import { Op } from 'sequelize'
+import { Op, where } from 'sequelize'
 import { Reports } from '../database/report_model.mjs'
 import { Ships } from '../database/ship_model.mjs'
 
@@ -27,11 +27,7 @@ export class reportController {
         !certificate ||
         !certificate_number ||
         !type ||
-        !price ||
-        !date_issuance ||
-        !date_expire ||
-        !date_endorsement ||
-        !date_plan_approval
+        !price
       ) {
         return res.status(400).json({
           message:
@@ -111,7 +107,9 @@ export class reportController {
 
   static async edit (req, res) {
     try {
-      //
+      const { uid } = req.query // Corregido: Desestructuración correcta
+      console.log(uid)
+      return res.status(200).send({ message: 'Reporte editado con éxito.' })
     } catch (error) {
       return res.status(500).send({ message: 'Error en el servidor' })
     }
@@ -119,9 +117,30 @@ export class reportController {
 
   static async delete (req, res) {
     try {
-      // const delete = await Form.destroy({})
-      //
+      const { uid } = req.query // Corregido: Desestructuración correcta
+      console.log(uid)
+
+      // Verificar si el reporte existe
+      const existReport = await Reports.findOne({ where: { id: uid } })
+      if (!existReport) {
+        return res
+          .status(404)
+          .send({ message: 'El reporte proporcionado no existe.' })
+      }
+
+      // Eliminar el reporte
+      const rowsDeleted = await Reports.destroy({ where: { id: uid } })
+      if (rowsDeleted === 0) {
+        return res
+          .status(404)
+          .send({ message: 'No se pudo eliminar el reporte. Inténtelo nuevamente.' })
+      }
+
+      return res
+        .status(200)
+        .send({ message: 'Reporte eliminado con éxito.' })
     } catch (error) {
+      console.error(error)
       return res.status(500).send({ message: 'Error en el servidor' })
     }
   }
@@ -279,6 +298,7 @@ export class reportController {
         name: report.name,
         imo: report.imo,
         certificate: report.certificate,
+        type: report.type,
         certificateNumber: report.certificate_number,
         price: report.price,
         dateIssuance: report.date_issuance,

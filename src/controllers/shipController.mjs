@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize'
 import { Ships } from '../database/ship_model.mjs'
+import { Reports } from '../database/report_model.mjs'
 
 /* eslint-disable camelcase */
 export class shipController {
@@ -67,9 +68,38 @@ export class shipController {
 
   static async delete (req, res) {
     try {
-      // const delete = await Form.destroy({})
-      //
+      const { uid } = req.query // Corregido: Desestructuración correcta
+      console.log(uid)
+
+      // Verificar si el barco existe
+      const existShip = await Ships.findOne({ where: { id: uid } })
+      if (!existShip) {
+        return res
+          .status(404)
+          .send({ message: 'El barco proporcionado no existe.' })
+      }
+
+      // Verificar si el barco está siendo referenciado en la tabla `reports`
+      const existReport = await Reports.findOne({ where: { ship_id: uid } })
+      if (existReport) {
+        return res
+          .status(400)
+          .send({ message: 'No se puede eliminar el barco porque está siendo utilizado en los informes.' })
+      }
+
+      // Eliminar el barco si no hay referencias en `reports`
+      const rowsDeleted = await Ships.destroy({ where: { id: uid } })
+      if (rowsDeleted === 0) {
+        return res
+          .status(404)
+          .send({ message: 'No se pudo eliminar el barco. Inténtelo nuevamente.' })
+      }
+
+      return res
+        .status(200)
+        .send({ message: 'Barco eliminado con éxito.' })
     } catch (error) {
+      console.error(error)
       return res.status(500).send({ message: 'Error en el servidor' })
     }
   }

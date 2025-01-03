@@ -16,7 +16,7 @@ Certificates.init(
     },
     abbreviations: {
       type: DataTypes.STRING(300),
-      allowNull: false
+      allowNull: true
     },
     name: {
       type: DataTypes.STRING(300),
@@ -24,7 +24,7 @@ Certificates.init(
     },
     price: {
       type: DataTypes.DECIMAL(10, 2), // Cambiado a DECIMAL para manejar precios con decimales
-      allowNull: false
+      allowNull: true
     }
   },
   {
