@@ -96,7 +96,7 @@ Reports.init(
 
 async function setup () {
   try {
-    await Reports.sync({ alter: true }) // Mover el await dentro de la función asíncrona
+    await Reports.sync() // Mover el await dentro de la función asíncrona
     console.log('Tabla reports sincronizada correctamente')
   } catch (error) {
     console.error('Error al sincronizar la tabla reports:', error)

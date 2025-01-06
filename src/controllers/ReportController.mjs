@@ -1,4 +1,4 @@
-import { Op, where } from 'sequelize'
+import { Op } from 'sequelize'
 import { Reports } from '../database/report_model.mjs'
 import { Ships } from '../database/ship_model.mjs'
 
@@ -30,8 +30,7 @@ export class reportController {
         !price
       ) {
         return res.status(400).json({
-          message:
-            'llene los campos obligatorios.'
+          message: 'Llene los campos obligatorios.'
         })
       }
 
@@ -55,19 +54,15 @@ export class reportController {
         })
       }
 
-      const dateFields = [
-        date_issuance,
-        date_expire,
-        date_endorsement,
-        date_plan_approval
-      ]
+      // Normalizar fechas: si están vacías o no tienen formato válido, asignar null
+      const normalizeDate = (date) =>
+        date && !isNaN(Date.parse(date)) ? new Date(date) : null
 
-      for (const date of dateFields) {
-        if (isNaN(Date.parse(date))) {
-          return res.status(400).json({
-            message: `La fecha '${date}' no tiene un formato válido.`
-          })
-        }
+      const normalizedDates = {
+        date_issuance: normalizeDate(date_issuance),
+        date_expire: normalizeDate(date_expire),
+        date_endorsement: normalizeDate(date_endorsement),
+        date_plan_approval: normalizeDate(date_plan_approval)
       }
 
       // Validar que el IMO exista en la base de datos
@@ -87,10 +82,7 @@ export class reportController {
         certificate_number,
         type,
         price: parseFloat(price),
-        date_issuance,
-        date_expire,
-        date_endorsement,
-        date_plan_approval,
+        ...normalizedDates, // Añadir las fechas normalizadas
         date_create: new Date() // Fecha actual
       })
 
